@@ -39,7 +39,7 @@ def encrypt_aes(hex_data, key, iv):
 def get_credentials(region):
     region = region.upper()
     if region == "IND":
-        return "3938172055", "ADITYA_FREE_INFO_IND"
+        return "3562381559", "AF18F2EB5A410D815F54B16EAEAC369FC027E96925005A629E90A823996B0240"
     elif region in ["NA", "BR", "SAC", "US"]:
         return "3938172433", "ADITYA_FREE_INFO_NA"
     else:
@@ -91,7 +91,7 @@ def main():
 
     try:
         # ✅ এখানে API URL ফিক্সড হলে সেট করুন (JWT response এ আর 'api' আসে না)
-        api_url = "https://clientbp.common.ggbluefox.com/GetPlayerPersonalShow"
+        api_url = "https://client.ind.freefiremobile.com/GetPlayerPersonalShow"
         response = requests.post(api_url, headers=headers, data=bytes.fromhex(encrypted_hex))
         response.raise_for_status()
     except requests.RequestException:
