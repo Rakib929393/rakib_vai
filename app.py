@@ -43,15 +43,19 @@ def get_credentials(region):
     elif region in ["NA", "BR", "SAC", "US"]:
         return "3938172433", "ADITYA_FREE_INFO_NA"
     else:
-        return "3938172267", "ADITYA_FREE_INFO_SG"
+        return "3971204486", "8912503D3C4A7F2E4BA97AF7A7EECB5C178AB5917E8AA0B652584FAD8A5766B7"
 
+# ✅ Updated JWT token response handler
 def get_jwt_token(region):
     uid, password = get_credentials(region)
     jwt_url = f"https://jwt-token-tau.vercel.app/get-token?uid={uid}&password={password}"
     response = requests.get(jwt_url)
     if response.status_code != 200:
         return None
-    return response.json()
+    data = response.json()
+    if 'token' not in data:
+        return None
+    return data['token']
 
 @app.route('/player', methods=['GET'])
 def main():
@@ -66,12 +70,9 @@ def main():
     except ValueError:
         return jsonify({"error": "Invalid UID"}), 400
 
-    jwt_info = get_jwt_token(region)
-    if not jwt_info or 'token' not in jwt_info:
+    token = get_jwt_token(region)
+    if not token:
         return jsonify({"error": "Failed to fetch JWT token"}), 500
-
-    api = jwt_info['api']
-    token = jwt_info['token']
 
     protobuf_data = create_protobuf(saturn_, 1)
     hex_data = protobuf_to_hex(protobuf_data)
@@ -89,7 +90,9 @@ def main():
     }
 
     try:
-        response = requests.post(f"{api}/GetPlayerPersonalShow", headers=headers, data=bytes.fromhex(encrypted_hex))
+        # ✅ এখানে API URL ফিক্সড হলে সেট করুন (JWT response এ আর 'api' আসে না)
+        api_url = "https://clientbp.common.ggbluefox.com/GetPlayerPersonalShow"
+        response = requests.post(api_url, headers=headers, data=bytes.fromhex(encrypted_hex))
         response.raise_for_status()
     except requests.RequestException:
         return jsonify({"error": "Failed to contact game server"}), 502
